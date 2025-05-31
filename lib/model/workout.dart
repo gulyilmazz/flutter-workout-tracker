@@ -5,6 +5,7 @@ class Exercise {
   final int reps;
   final double weight;
   final DateTime timestamp;
+  final int restSeconds; // Setler arası dinlenme süresi
 
   Exercise({
     required this.id,
@@ -13,6 +14,7 @@ class Exercise {
     required this.reps,
     required this.weight,
     required this.timestamp,
+    this.restSeconds = 60, // Varsayılan 60 saniye
   });
 
   Map<String, dynamic> toJson() {
@@ -23,6 +25,7 @@ class Exercise {
       'reps': reps,
       'weight': weight,
       'timestamp': timestamp.toIso8601String(),
+      'restSeconds': restSeconds,
     };
   }
 
@@ -34,6 +37,7 @@ class Exercise {
       reps: json['reps'],
       weight: json['weight'].toDouble(),
       timestamp: DateTime.parse(json['timestamp']),
+      restSeconds: json['restSeconds'] ?? 60,
     );
   }
 }
@@ -71,6 +75,35 @@ class Workout {
       exercises:
           (json['exercises'] as List).map((e) => Exercise.fromJson(e)).toList(),
       duration: Duration(minutes: json['duration']),
+    );
+  }
+}
+
+class WorkoutTemplate {
+  final String id;
+  final String name;
+  final List<Exercise> exercises;
+
+  WorkoutTemplate({
+    required this.id,
+    required this.name,
+    required this.exercises,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'exercises': exercises.map((e) => e.toJson()).toList(),
+    };
+  }
+
+  factory WorkoutTemplate.fromJson(Map<String, dynamic> json) {
+    return WorkoutTemplate(
+      id: json['id'],
+      name: json['name'],
+      exercises:
+          (json['exercises'] as List).map((e) => Exercise.fromJson(e)).toList(),
     );
   }
 }

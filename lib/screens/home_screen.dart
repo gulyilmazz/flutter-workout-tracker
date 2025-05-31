@@ -21,17 +21,78 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.fitness_center),
-            label: 'Workout',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Color(0xFF6C5CE7),
+          unselectedItemColor: Colors.grey[600],
+          selectedLabelStyle: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Stats'),
-        ],
+          unselectedLabelStyle: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 11,
+          ),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          items: [
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: EdgeInsets.all(8),
+                decoration:
+                    _currentIndex == 0
+                        ? BoxDecoration(
+                          color: Color(0xFF6C5CE7).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        )
+                        : null,
+                child: Icon(Icons.fitness_center_rounded, size: 24),
+              ),
+              label: 'Antrenman',
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: EdgeInsets.all(8),
+                decoration:
+                    _currentIndex == 1
+                        ? BoxDecoration(
+                          color: Color(0xFF6C5CE7).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        )
+                        : null,
+                child: Icon(Icons.history_rounded, size: 24),
+              ),
+              label: 'Geçmiş',
+            ),
+            BottomNavigationBarItem(
+              icon: Container(
+                padding: EdgeInsets.all(8),
+                decoration:
+                    _currentIndex == 2
+                        ? BoxDecoration(
+                          color: Color(0xFF6C5CE7).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        )
+                        : null,
+                child: Icon(Icons.analytics_rounded, size: 24),
+              ),
+              label: 'İstatistikler',
+            ),
+          ],
+        ),
       ),
     );
   }
