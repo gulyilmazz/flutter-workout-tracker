@@ -13,8 +13,8 @@ class WorkoutProvider with ChangeNotifier {
   bool _isLoading = false;
   int _streak = 0;
   DateTime? _lastWorkoutDate;
+  RecoverySuggestion? _recoverySuggestion;
 
-  // Getters
   List<Workout> get workouts => [..._workouts];
   List<Exercise> get currentExercises => [..._currentExercises];
   List<WorkoutTemplate> get templates => [..._templates];
@@ -22,13 +22,13 @@ class WorkoutProvider with ChangeNotifier {
   String get currentWorkoutName => _currentWorkoutName;
   bool get isLoading => _isLoading;
   int get streak => _streak;
+  RecoverySuggestion? get recoverySuggestion => _recoverySuggestion;
 
   Duration get currentWorkoutDuration {
     if (_workoutStartTime == null) return Duration.zero;
     return DateTime.now().difference(_workoutStartTime!);
   }
 
-  // Statistics
   int get totalWorkouts => _workouts.length;
   int get totalExercises =>
       _workouts.expand((workout) => workout.exercises).length;
@@ -47,7 +47,6 @@ class WorkoutProvider with ChangeNotifier {
     loadStreak();
   }
 
-  // Workout Management
   void startWorkout(String name, {WorkoutTemplate? template}) {
     _currentWorkoutName = name;
     _isWorkoutActive = true;
@@ -108,6 +107,22 @@ class WorkoutProvider with ChangeNotifier {
       saveTemplates();
     }
 
+    _recoverySuggestion = RecoverySuggestion(
+      title: "Antrenmandan Sonra İyileşme",
+      description:
+          "Kaslarını onarmak ve enerji depolarını yenilemek için aşağıdaki önerilere göz at!",
+      foodItems: [
+        "Protein Shake: 1 ölçek whey protein, 1 muz, 1 yemek kaşığı fıstık ezmesi",
+        "Yemek: 150g ızgara tavuk, 100g tatlı patates, bir avuç ıspanak",
+        "Atıştırmalık: 200g Yunan yoğurdu, 1 avuç yaban mersini, 1 tatlı kaşığı bal",
+      ],
+      drinkItems: [
+        "Su: 500-750 ml",
+        "Hindistancevizi suyu: Elektrolit dengesi için",
+        "Yeşil Çay: Antioksidan etkisiyle iyileşmeyi destekler",
+      ],
+    );
+
     _isWorkoutActive = false;
     _workoutStartTime = null;
     _currentWorkoutName = '';
@@ -148,7 +163,6 @@ class WorkoutProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Streak Management
   void updateStreak() {
     final today = DateTime.now();
     final todayDate = DateTime(today.year, today.month, today.day);
@@ -168,7 +182,7 @@ class WorkoutProvider with ChangeNotifier {
     } else if (todayDate.difference(lastWorkout).inDays > 1) {
       _streak = 1;
     } else {
-      _streak = _streak; // Aynı gün içinde tekrar artmaz
+      _streak = _streak;
     }
 
     _lastWorkoutDate = today;
@@ -176,7 +190,6 @@ class WorkoutProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Data Persistence
   Future<void> saveWorkouts() async {
     try {
       _isLoading = true;
@@ -274,4 +287,23 @@ class WorkoutProvider with ChangeNotifier {
       print('Error loading streak: $e');
     }
   }
+
+  void clearRecoverySuggestion() {
+    _recoverySuggestion = null;
+    notifyListeners();
+  }
+}
+
+class RecoverySuggestion {
+  final String title;
+  final String description;
+  final List<String> foodItems;
+  final List<String> drinkItems;
+
+  RecoverySuggestion({
+    required this.title,
+    required this.description,
+    required this.foodItems,
+    required this.drinkItems,
+  });
 }

@@ -4,6 +4,73 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 import '../providers/workout_provider.dart';
 
+// Onay ekranı için yeni bir sınıf
+class ConfirmationScreen extends StatelessWidget {
+  final String? food;
+  final String? drink;
+
+  const ConfirmationScreen({Key? key, this.food, this.drink}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Seçim Onayı'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: IconThemeData(color: Color(0xFF2D3436)),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Seçiminiz',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF2D3436),
+              ),
+            ),
+            SizedBox(height: 16),
+            if (food != null)
+              Text(
+                'Yiyecek: $food',
+                style: TextStyle(fontSize: 18, color: Color(0xFF2D3436)),
+              ),
+            if (drink != null)
+              Text(
+                'İçecek: $drink',
+                style: TextStyle(fontSize: 18, color: Color(0xFF2D3436)),
+              ),
+            SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF6C5CE7),
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Tamam',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class WorkoutScreen extends StatefulWidget {
   @override
   _WorkoutScreenState createState() => _WorkoutScreenState();
@@ -91,7 +158,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     ),
                     SizedBox(width: 4),
                     Text(
-                      '${provider.streak}', // currentStreak yerine streak
+                      '${provider.streak}',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -123,7 +190,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Streak Card
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(24),
@@ -151,7 +217,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 ),
                 SizedBox(height: 12),
                 Text(
-                  '${workoutProvider.streak} Gün', // currentStreak yerine streak
+                  '${workoutProvider.streak} Gün',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w700,
@@ -189,7 +255,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
           SizedBox(height: 32),
 
-          // Quick Start Section
           Text(
             'Hızlı Başlat',
             style: TextStyle(
@@ -263,7 +328,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
           SizedBox(height: 32),
 
-          // Templates Section
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -399,7 +463,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   Widget _buildActiveWorkoutView(WorkoutProvider workoutProvider) {
     return Column(
       children: [
-        // Workout Header
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(20),
@@ -424,7 +487,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 ),
                 SizedBox(height: 12),
                 StreamBuilder(
-                  stream: Stream.periodic(Duration(seconds: 1)),
+                  stream:
+                      workoutProvider.isWorkoutActive
+                          ? Stream.periodic(Duration(seconds: 1))
+                          : null, // Antrenman bitince stream durur
                   builder: (context, snapshot) {
                     final duration = workoutProvider.currentWorkoutDuration;
                     return Text(
@@ -442,7 +508,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
           ),
         ),
 
-        // Rest Timer
         if (_isResting)
           Container(
             width: double.infinity,
@@ -494,7 +559,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             ),
           ),
 
-        // Exercises List
         Expanded(
           child:
               workoutProvider.currentExercises.isEmpty
@@ -545,7 +609,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   ),
         ),
 
-        // Bottom Actions
         Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -579,21 +642,30 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                   ),
                 ),
                 SizedBox(width: 12),
-                ElevatedButton.icon(
-                  onPressed:
-                      workoutProvider.currentExercises.isNotEmpty
-                          ? () => _showFinishWorkoutDialog(context)
-                          : null,
-                  icon: Icon(Icons.check_rounded),
-                  label: Text('Bitir'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF00B894),
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      if (workoutProvider.isWorkoutActive) {
+                        _showFinishWorkoutDialog(context);
+                      }
+                    },
+                    icon: Icon(Icons.check_rounded),
+                    label: Text('Bitir'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          workoutProvider.isWorkoutActive
+                              ? Color(0xFF00B894)
+                              : Colors.grey,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 24,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
                     ),
-                    elevation: 0,
                   ),
                 ),
               ],
@@ -908,24 +980,32 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  context.read<WorkoutProvider>().finishWorkout();
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          Icon(Icons.celebration_rounded, color: Colors.white),
-                          SizedBox(width: 8),
-                          Text('Tebrikler! Antrenman tamamlandı 🎉'),
-                        ],
+                  final provider = context.read<WorkoutProvider>();
+                  if (provider.isWorkoutActive) {
+                    provider.finishWorkout();
+                    _stopRestTimer(); // Timer'ı burada durduruyoruz
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            Icon(
+                              Icons.celebration_rounded,
+                              color: Colors.white,
+                            ),
+                            SizedBox(width: 8),
+                            Text('Tebrikler! Antrenman tamamlandı 🎉'),
+                          ],
+                        ),
+                        backgroundColor: Color(0xFF00B894),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      backgroundColor: Color(0xFF00B894),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
+                    );
+                    _showRecoverySuggestionDialog(context);
+                  }
                 },
                 child: Text('Bitir'),
                 style: ElevatedButton.styleFrom(
@@ -934,6 +1014,167 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               ),
             ],
           ),
+    );
+  }
+
+  void _showRecoverySuggestionDialog(BuildContext context) {
+    final provider = context.read<WorkoutProvider>();
+
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Row(
+              children: [
+                Icon(Icons.restaurant_rounded, color: Color(0xFF00B894)),
+                SizedBox(width: 8),
+                Text('İyileşme Seçenekleri'),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Ne yemeyi seçiyorsun?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3436),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  _buildOptionButton(
+                    context,
+                    "Protein Shake: 1 ölçek whey protein, 1 muz, 1 yemek kaşığı fıstık ezmesi",
+                    () => _handleFoodSelection(
+                      context,
+                      "Protein Shake: 1 ölçek whey protein, 1 muz, 1 yemek kaşığı fıstık ezmesi",
+                    ),
+                  ),
+                  _buildOptionButton(
+                    context,
+                    "Yemek: 150g ızgara tavuk, 100g tatlı patates, bir avuç ıspanak",
+                    () => _handleFoodSelection(
+                      context,
+                      "Yemek: 150g ızgara tavuk, 100g tatlı patates, bir avuç ıspanak",
+                    ),
+                  ),
+                  _buildOptionButton(
+                    context,
+                    "Atıştırmalık: 200g Yunan yoğurdu, 1 avuç yaban mersini, 1 tatlı kaşığı bal",
+                    () => _handleFoodSelection(
+                      context,
+                      "Atıştırmalık: 200g Yunan yoğurdu, 1 avuç yaban mersini, 1 tatlı kaşığı bal",
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "Ne içmeyi seçiyorsun?",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3436),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  _buildOptionButton(
+                    context,
+                    "Su: 500-750 ml",
+                    () => _handleDrinkSelection(context, "Su: 500-750 ml"),
+                  ),
+                  _buildOptionButton(
+                    context,
+                    "Hindistancevizi suyu: Elektrolit dengesi için",
+                    () => _handleDrinkSelection(
+                      context,
+                      "Hindistancevizi suyu: Elektrolit dengesi için",
+                    ),
+                  ),
+                  _buildOptionButton(
+                    context,
+                    "Yeşil Çay: Antioksidan etkisiyle iyileşmeyi destekler",
+                    () => _handleDrinkSelection(
+                      context,
+                      "Yeşil Çay: Antioksidan etkisiyle iyileşmeyi destekler",
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  provider.clearRecoverySuggestion();
+                  Navigator.pop(context);
+                },
+                child: Text('Kapat'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  Widget _buildOptionButton(
+    BuildContext context,
+    String label,
+    VoidCallback onPressed,
+  ) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Color(0xFF6C5CE7),
+          foregroundColor: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          minimumSize: Size(double.infinity, 50),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      ),
+    );
+  }
+
+  void _handleFoodSelection(BuildContext context, String food) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Seçtin: $food - Afiyet olsun!'),
+        backgroundColor: Color(0xFF00B894),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+    Navigator.pop(context); // Dialogu kapat
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ConfirmationScreen(food: food)),
+    );
+  }
+
+  void _handleDrinkSelection(BuildContext context, String drink) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Seçtin: $drink - Şifa olsun!'),
+        backgroundColor: Color(0xFF00B894),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+    Navigator.pop(context); // Dialogu kapat
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ConfirmationScreen(drink: drink)),
     );
   }
 
