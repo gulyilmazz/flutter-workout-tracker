@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../providers/workout_provider.dart';
 
 class StatsScreen extends StatelessWidget {
+  const StatsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +40,7 @@ class StatsScreen extends StatelessWidget {
                 SizedBox(height: 24),
                 _buildOverallStatsSection(workoutProvider),
                 SizedBox(height: 24),
-                if ((workoutProvider.streak ?? 0) > 0)
+                if ((workoutProvider.streak) > 0)
                   _buildStreakSection(workoutProvider),
                 SizedBox(height: 24),
                 _buildWeeklyProgressSection(workoutProvider),
@@ -110,6 +112,7 @@ class StatsScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(12),
                         decoration: BoxDecoration(
+                          // ignore: deprecated_member_use
                           color: Color(0xFF6C5CE7).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -166,6 +169,7 @@ class StatsScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
+            // ignore: deprecated_member_use
             color: Color(0xFF6C5CE7).withOpacity(0.3),
             blurRadius: 20,
             offset: Offset(0, 12),

@@ -9,7 +9,7 @@ class ConfirmationScreen extends StatelessWidget {
   final String? food;
   final String? drink;
 
-  const ConfirmationScreen({Key? key, this.food, this.drink}) : super(key: key);
+  const ConfirmationScreen({super.key, this.food, this.drink});
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +80,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   Timer? _restTimer;
   int _remainingRestTime = 0;
   bool _isResting = false;
-  int _currentExerciseIndex = 0;
-  int _currentSetIndex = 0;
 
   @override
   void dispose() {
@@ -232,7 +230,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                if ((workoutProvider.streak ?? 0) > 0) ...[
+                if ((workoutProvider.streak) > 0) ...[
                   SizedBox(height: 16),
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
